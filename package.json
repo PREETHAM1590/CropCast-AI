@@ -5,6 +5,7 @@
     "tailwindcss": "^4.1.7"
   },
   "scripts": {
-    "build:css": "npx tailwindcss -i ./frontend/css/tailwind-input.css -o ./frontend/css/tailwind-output.css"
+    "build:css": "npx tailwindcss -i ./frontend/css/tailwind-input.css -o ./frontend/css/tailwind-output.css",
+    "vercel-build": "npm run build:css"
   }
 }
