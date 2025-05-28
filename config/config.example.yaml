@@ -1,0 +1,198 @@
+# WeatherCrop AI Platform Configuration
+# Copy this file to config.yaml and fill in your API keys and settings
+
+# API Keys and Credentials
+api_keys:
+  # ISRO Bhuvan API for satellite data
+  bhuvan_api_key: "your_bhuvan_api_key_here"
+
+  # Weather APIs
+  openweather_api_key: "your_openweather_api_key_here"
+  weatherapi_key: "your_weatherapi_key_here"
+
+  # Agricultural Data APIs
+  agri_data_api_key: "your_agricultural_data_api_key_here"
+
+  # Market Data APIs
+  commodity_api_key: "your_commodity_price_api_key_here"
+
+  # Database credentials
+  postgres_url: "postgresql://username:password@localhost:5432/wchr_db"
+  mongodb_url: "mongodb://localhost:27017/wchr_db"
+
+# Data Sources Configuration
+data_sources:
+  # IMD (India Meteorological Department) Data
+  imd:
+    base_url: "https://mausam.imd.gov.in/imd_latest/contents/rainfall_data.php"
+    data_format: "csv"
+    update_frequency: "daily"
+
+  # ISRO Bhuvan Satellite Data
+  bhuvan:
+    base_url: "https://bhuvan-app1.nrsc.gov.in/api"
+    tile_server: "https://bhuvan-vec1.nrsc.gov.in/bhuvan"
+    supported_layers: ["soil", "landuse", "elevation", "drainage"]
+
+  # Soil Health Card Data
+  soil_health:
+    base_url: "https://soilhealth.dac.gov.in/PublicReports"
+    data_format: "json"
+
+  # Market Price Data
+  market_data:
+    base_url: "https://agmarknet.gov.in/SearchCmmMkt.aspx"
+    commodities: ["rice", "wheat", "cotton", "sugarcane", "maize"]
+
+# Model Configuration
+models:
+  # Rainfall Prediction Model
+  rainfall_prediction:
+    model_type: "lstm_arima_ensemble"
+    lstm_params:
+      sequence_length: 60
+      hidden_units: 128
+      dropout_rate: 0.2
+      epochs: 100
+      batch_size: 32
+    arima_params:
+      order: [2, 1, 2]
+      seasonal_order: [1, 1, 1, 12]
+    ensemble_weights: [0.6, 0.4]  # LSTM, ARIMA
+
+  # Flood Risk Assessment
+  flood_risk:
+    model_type: "random_forest"
+    n_estimators: 200
+    max_depth: 15
+    min_samples_split: 5
+    min_samples_leaf: 2
+    features:
+      - "elevation"
+      - "rainfall_intensity"
+      - "drainage_density"
+      - "soil_permeability"
+      - "river_proximity"
+      - "historical_floods"
+
+  # Soil Analysis
+  soil_analysis:
+    model_type: "cnn_ensemble"
+    image_size: [224, 224]
+    batch_size: 16
+    epochs: 50
+    learning_rate: 0.001
+    pretrained_model: "resnet50"
+    classes: ["clay", "sandy", "loamy", "black_soil", "red_soil"]
+
+  # Crop Recommendation
+  crop_recommendation:
+    model_type: "multi_factor_ml"
+    algorithms: ["random_forest", "gradient_boosting", "neural_network"]
+    ensemble_method: "voting"
+    features:
+      - "predicted_rainfall"
+      - "soil_npk"
+      - "soil_ph"
+      - "temperature"
+      - "humidity"
+      - "market_price"
+      - "historical_yield"
+
+  # Yield Prediction
+  yield_prediction:
+    model_type: "deep_neural_network"
+    architecture: "feedforward"
+    hidden_layers: [256, 128, 64, 32]
+    dropout_rate: 0.3
+    activation: "relu"
+    optimizer: "adam"
+    learning_rate: 0.001
+    epochs: 100
+
+# Data Processing Configuration
+data_processing:
+  # Image preprocessing for satellite data
+  image_preprocessing:
+    resize_dimensions: [512, 512]
+    normalization: "min_max"
+    augmentation:
+      rotation_range: 15
+      width_shift_range: 0.1
+      height_shift_range: 0.1
+      horizontal_flip: true
+
+  # Time series preprocessing
+  time_series:
+    missing_value_strategy: "interpolation"
+    outlier_detection: "iqr"
+    smoothing: "moving_average"
+    window_size: 7
+
+  # Feature engineering
+  feature_engineering:
+    create_lag_features: true
+    lag_periods: [1, 7, 30, 365]
+    create_rolling_features: true
+    rolling_windows: [7, 30, 90]
+
+# Application Settings
+app:
+  # Server configuration
+  host: "0.0.0.0"
+  port: 8001
+  debug: false
+
+  # Logging
+  log_level: "INFO"
+  log_file: "logs/wchr.log"
+
+  # Cache settings
+  cache_ttl: 3600  # 1 hour
+
+  # Rate limiting
+  rate_limit: "100/hour"
+
+# Geographic Configuration
+geography:
+  # Default region (India)
+  default_country: "IN"
+  default_bbox: [68.0, 6.0, 97.0, 37.0]  # India bounding box
+
+  # Coordinate system
+  crs: "EPSG:4326"  # WGS84
+
+  # Grid resolution for analysis
+  grid_resolution: 0.1  # degrees
+
+# Model Training Configuration
+training:
+  # Data split ratios
+  train_ratio: 0.7
+  validation_ratio: 0.15
+  test_ratio: 0.15
+
+  # Cross-validation
+  cv_folds: 5
+
+  # Model persistence
+  model_save_path: "data/models/"
+  checkpoint_frequency: 10  # epochs
+
+  # Early stopping
+  early_stopping_patience: 15
+  early_stopping_metric: "val_loss"
+
+# Prediction Configuration
+prediction:
+  # Forecast horizons
+  rainfall_forecast_days: 365
+  flood_risk_forecast_days: 30
+  yield_prediction_months: 6
+
+  # Confidence intervals
+  confidence_level: 0.95
+
+  # Update frequency
+  model_update_frequency: "monthly"
+  data_refresh_frequency: "daily"

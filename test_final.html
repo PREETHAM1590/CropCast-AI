@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropCast AI - Final Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #101a23;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        .status {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .success { background: #10b981; }
+        .error { background: #ef4444; }
+        .warning { background: #f59e0b; color: black; }
+        .info { background: #3b82f6; }
+        .test-section {
+            background: #1f2937;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #3d98f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2c7de0; }
+        .result {
+            background: #223649;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌾 CropCast AI - Final Functionality Test</h1>
+    
+    <div id="status" class="status info">
+        🔄 Testing CropCast AI components...
+    </div>
+
+    <div class="test-section">
+        <h2>✅ JavaScript Loading Test</h2>
+        <div id="js-status" class="result">Loading JavaScript files...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Component Tests</h2>
+        <button onclick="testComponents()">Test UI Components</button>
+        <button onclick="testCharts()">Test Charts</button>
+        <button onclick="testUtils()">Test Utilities</button>
+        <div id="component-results" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📱 Navigation Test</h2>
+        <button onclick="testNavigation()">Test Page Navigation</button>
+        <div id="nav-results" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 API Tests</h2>
+        <button onclick="testAPI()">Test API Service</button>
+        <div id="api-results" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Launch Application</h2>
+        <a href="frontend/index.html" target="_blank">
+            <button style="background: #10b981; font-size: 18px; padding: 15px 30px;">
+                🌾 Open CropCast AI
+            </button>
+        </a>
+    </div>
+
+    <script>
+        let hasError = false;
+        let loadedScripts = 0;
+        const totalScripts = 6;
+
+        // Catch any JavaScript errors
+        window.addEventListener('error', function(e) {
+            hasError = true;
+            document.getElementById('status').className = 'status error';
+            document.getElementById('status').innerHTML = `
+                ❌ JavaScript Error Found:<br>
+                <strong>File:</strong> ${e.filename}<br>
+                <strong>Line:</strong> ${e.lineno}<br>
+                <strong>Error:</strong> ${e.message}
+            `;
+        });
+
+        // Load scripts one by one to test
+        const scripts = [
+            'frontend/js/config.js',
+            'frontend/js/api.js',
+            'frontend/js/utils.js',
+            'frontend/js/components.js',
+            'frontend/js/pages.js',
+            'frontend/js/app.js'
+        ];
+
+        function loadScript(index) {
+            if (index >= scripts.length) {
+                if (!hasError) {
+                    document.getElementById('status').className = 'status success';
+                    document.getElementById('status').innerHTML = `
+                        ✅ SUCCESS! All JavaScript files loaded without errors!<br>
+                        🎉 CropCast AI is ready to run!<br>
+                        🚀 All ${totalScripts} scripts loaded successfully
+                    `;
+                    document.getElementById('js-status').innerHTML = '✅ All JavaScript files loaded successfully!';
+                }
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = scripts[index];
+            script.onload = function() {
+                loadedScripts++;
+                document.getElementById('js-status').innerHTML = `✅ Loaded ${loadedScripts}/${totalScripts}: ${scripts[index]}`;
+                setTimeout(() => loadScript(index + 1), 100);
+            };
+            script.onerror = function() {
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').innerHTML = `
+                    ❌ Failed to load: ${scripts[index]}<br>
+                    Check the browser console for details
+                `;
+            };
+            document.head.appendChild(script);
+        }
+
+        // Start loading scripts
+        setTimeout(() => loadScript(0), 1000);
+
+        function log(message, elementId = 'component-results') {
+            const element = document.getElementById(elementId);
+            element.innerHTML += message + '<br>';
+        }
+
+        function testComponents() {
+            log('🧪 Testing UI Components...', 'component-results');
+            
+            try {
+                if (typeof Components !== 'undefined') {
+                    log('✅ Components object found');
+                    
+                    // Test component methods
+                    const methods = ['createStatsCard', 'createCropCard', 'createProgressBar', 'createMonthlyCards'];
+                    methods.forEach(method => {
+                        if (typeof Components[method] === 'function') {
+                            log(`✅ ${method} method available`);
+                        } else {
+                            log(`❌ ${method} method missing`);
+                        }
+                    });
+                } else {
+                    log('❌ Components object not found');
+                }
+            } catch (error) {
+                log(`❌ Component test failed: ${error.message}`);
+            }
+        }
+
+        function testCharts() {
+            log('📊 Testing Chart Components...', 'component-results');
+            
+            try {
+                if (typeof Chart !== 'undefined') {
+                    log('✅ Chart.js library loaded');
+                } else {
+                    log('❌ Chart.js library not found');
+                }
+                
+                if (typeof Components !== 'undefined') {
+                    const chartMethods = ['createRainfallChart', 'createSoilCompositionChart', 'createNPKChart'];
+                    chartMethods.forEach(method => {
+                        if (typeof Components[method] === 'function') {
+                            log(`✅ ${method} available`);
+                        } else {
+                            log(`❌ ${method} missing`);
+                        }
+                    });
+                }
+            } catch (error) {
+                log(`❌ Chart test failed: ${error.message}`);
+            }
+        }
+
+        function testUtils() {
+            log('🔧 Testing Utility Functions...', 'component-results');
+            
+            try {
+                if (typeof Utils !== 'undefined') {
+                    log('✅ Utils object found');
+                    
+                    const utilMethods = ['formatDate', 'formatNumber', 'debounce', 'showNotification'];
+                    utilMethods.forEach(method => {
+                        if (typeof Utils[method] === 'function') {
+                            log(`✅ ${method} method available`);
+                        } else {
+                            log(`❌ ${method} method missing`);
+                        }
+                    });
+                } else {
+                    log('❌ Utils object not found');
+                }
+            } catch (error) {
+                log(`❌ Utils test failed: ${error.message}`);
+            }
+        }
+
+        function testNavigation() {
+            log('🧭 Testing Navigation System...', 'nav-results');
+            
+            try {
+                if (typeof window.cropCastApp !== 'undefined') {
+                    log('✅ CropCast App instance found');
+                    
+                    if (typeof window.cropCastApp.navigateToPage === 'function') {
+                        log('✅ Navigation method available');
+                    } else {
+                        log('❌ Navigation method missing');
+                    }
+                } else {
+                    log('❌ CropCast App instance not found');
+                }
+                
+                // Test global functions
+                const globalFunctions = ['getCurrentLocation', 'downloadReport', 'setAlert', 'applyFilters'];
+                globalFunctions.forEach(func => {
+                    if (typeof window[func] === 'function') {
+                        log(`✅ ${func} global function available`);
+                    } else {
+                        log(`❌ ${func} global function missing`);
+                    }
+                });
+            } catch (error) {
+                log(`❌ Navigation test failed: ${error.message}`, 'nav-results');
+            }
+        }
+
+        function testAPI() {
+            log('🌐 Testing API Service...', 'api-results');
+            
+            try {
+                if (typeof apiService !== 'undefined') {
+                    log('✅ API Service found');
+                    
+                    const apiMethods = ['healthCheck', 'predictRainfall', 'analyzeSoil', 'recommendCrops'];
+                    apiMethods.forEach(method => {
+                        if (typeof apiService[method] === 'function') {
+                            log(`✅ ${method} method available`);
+                        } else {
+                            log(`❌ ${method} method missing`);
+                        }
+                    });
+                } else {
+                    log('❌ API Service not found');
+                }
+            } catch (error) {
+                log(`❌ API test failed: ${error.message}`, 'api-results');
+            }
+        }
+    </script>
+</body>
+</html>

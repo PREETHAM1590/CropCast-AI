@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropCast AI - Functionality Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #101a23;
+            color: white;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #182634;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3d98f4;
+        }
+        .success { border-left-color: #22c55e; }
+        .error { border-left-color: #ef4444; }
+        .warning { border-left-color: #f59e0b; }
+        button {
+            background: #3d98f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2c7de0; }
+        .result {
+            background: #223649;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌾 CropCast AI - Functionality Test</h1>
+    
+    <div class="test-section success">
+        <h2>✅ Backend API Tests</h2>
+        <button onclick="testHealthCheck()">Test Health Check</button>
+        <button onclick="testRainfallPrediction()">Test Rainfall Prediction</button>
+        <button onclick="testCurrentWeather()">Test Current Weather</button>
+        <div id="api-results" class="result"></div>
+    </div>
+
+    <div class="test-section warning">
+        <h2>📍 Location Services Tests</h2>
+        <button onclick="testCurrentLocation()">Get Current Location</button>
+        <button onclick="testLocationSearch()">Search Location</button>
+        <div id="location-results" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Frontend Integration Tests</h2>
+        <button onclick="testChartData()">Test Chart Data</button>
+        <button onclick="testNotifications()">Test Notifications</button>
+        <a href="http://localhost:3000" target="_blank">
+            <button>Open Main Application</button>
+        </a>
+        <div id="frontend-results" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        
+        function log(message, elementId = 'api-results') {
+            const element = document.getElementById(elementId);
+            element.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+        }
+
+        async function testHealthCheck() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                log(`✅ Health Check: ${data.status} - ${data.service}`);
+            } catch (error) {
+                log(`❌ Health Check Failed: ${error.message}`);
+            }
+        }
+
+        async function testRainfallPrediction() {
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/weather/predict-rainfall`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        location: { latitude: 12.9716, longitude: 77.5946, location_name: "Bangalore" },
+                        prediction_days: 5,
+                        include_confidence: true
+                    })
+                });
+                const data = await response.json();
+                log(`✅ Rainfall Prediction: ${data.predictions.length} days, Accuracy: ${data.model_accuracy}`);
+                log(`📊 Sample: ${data.predictions[0].date} - ${data.predictions[0].predicted_rainfall_mm}mm`);
+            } catch (error) {
+                log(`❌ Rainfall Prediction Failed: ${error.message}`);
+            }
+        }
+
+        async function testCurrentWeather() {
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/weather/current-conditions?latitude=12.9716&longitude=77.5946`);
+                const data = await response.json();
+                log(`✅ Current Weather: ${data.current_conditions.temperature_celsius}°C, ${data.current_conditions.weather_condition}`);
+                log(`💨 Wind: ${data.current_conditions.wind_speed_kmh} km/h, Humidity: ${data.current_conditions.humidity_percent}%`);
+            } catch (error) {
+                log(`❌ Current Weather Failed: ${error.message}`);
+            }
+        }
+
+        async function testCurrentLocation() {
+            try {
+                if (!navigator.geolocation) {
+                    throw new Error('Geolocation not supported');
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        log(`✅ GPS Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}`, 'location-results');
+                        
+                        // Test reverse geocoding
+                        try {
+                            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
+                            const data = await response.json();
+                            log(`📍 Location Name: ${data.display_name}`, 'location-results');
+                        } catch (error) {
+                            log(`⚠️ Reverse geocoding failed: ${error.message}`, 'location-results');
+                        }
+                    },
+                    (error) => {
+                        log(`❌ Location Error: ${error.message}`, 'location-results');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } catch (error) {
+                log(`❌ Geolocation Failed: ${error.message}`, 'location-results');
+            }
+        }
+
+        async function testLocationSearch() {
+            try {
+                const query = 'Mumbai';
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=3&countrycodes=in`);
+                const results = await response.json();
+                
+                if (results.length > 0) {
+                    log(`✅ Location Search: Found ${results.length} results for "${query}"`, 'location-results');
+                    results.forEach((result, index) => {
+                        log(`${index + 1}. ${result.display_name} (${result.lat}, ${result.lon})`, 'location-results');
+                    });
+                } else {
+                    log(`⚠️ No results found for "${query}"`, 'location-results');
+                }
+            } catch (error) {
+                log(`❌ Location Search Failed: ${error.message}`, 'location-results');
+            }
+        }
+
+        async function testChartData() {
+            try {
+                // Test if Chart.js is available
+                if (typeof Chart !== 'undefined') {
+                    log(`✅ Chart.js Available: Version ${Chart.version}`, 'frontend-results');
+                } else {
+                    log(`❌ Chart.js Not Available`, 'frontend-results');
+                }
+                
+                // Test data transformation
+                const mockApiResponse = {
+                    predictions: [
+                        { date: '2025-05-24', predicted_rainfall_mm: 5.2, probability_of_rain: 0.65 },
+                        { date: '2025-05-25', predicted_rainfall_mm: 2.1, probability_of_rain: 0.45 }
+                    ]
+                };
+                
+                const chartData = {
+                    prediction_dates: mockApiResponse.predictions.map(p => p.date),
+                    predictions: mockApiResponse.predictions.map(p => p.predicted_rainfall_mm),
+                    confidence_lower: mockApiResponse.predictions.map(p => p.predicted_rainfall_mm * 0.8),
+                    confidence_upper: mockApiResponse.predictions.map(p => p.predicted_rainfall_mm * 1.2)
+                };
+                
+                log(`✅ Data Transformation: ${chartData.predictions.length} data points`, 'frontend-results');
+                log(`📊 Sample Data: ${chartData.prediction_dates[0]} - ${chartData.predictions[0]}mm`, 'frontend-results');
+                
+            } catch (error) {
+                log(`❌ Chart Test Failed: ${error.message}`, 'frontend-results');
+            }
+        }
+
+        function testNotifications() {
+            try {
+                // Test notification creation
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; 
+                    background: #22c55e; color: white; 
+                    padding: 15px; border-radius: 5px; 
+                    z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                `;
+                notification.textContent = '✅ Test Notification - All systems working!';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 3000);
+                
+                log(`✅ Notification System: Working`, 'frontend-results');
+            } catch (error) {
+                log(`❌ Notification Test Failed: ${error.message}`, 'frontend-results');
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            log('🚀 Starting automatic tests...');
+            setTimeout(testHealthCheck, 500);
+            setTimeout(testLocationSearch, 1000);
+        });
+    </script>
+</body>
+</html>

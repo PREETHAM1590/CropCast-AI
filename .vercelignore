@@ -1,0 +1,78 @@
+# Development and local files
+.DS_Store
+*.pem
+*.env
+.env.*
+.vscode/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.local
+
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-freeze.txt
+*.egg-info/
+.ipynb_checkpoints/
+
+# Project specific unnecessary files
+check_syntax.js
+DEPLOYMENT_GUIDE.md
+FINAL_STATUS.md
+final_test.html
+FINAL_VERIFICATION.md
+find_syntax_error.js
+FIXES_COMPLETE.md
+FIXES_SUMMARY.md
+# LICENSE (Keep if you want it in the repo, but Vercel doesn't need it to run)
+serve_frontend.py
+# setup.py (If not building a distributable package)
+STATUS_REPORT.md
+SUCCESS_CONFIRMATION.md
+SYNTAX_FIXED_CONFIRMATION.md
+test_final.html
+test_functionality.html
+test_installation.py
+test_syntax.html
+
+# Config examples
+config/config.example.yaml
+
+# Raw/ unprocessed data (if not needed for build or static serving)
+# data/raw/
+# data/processed/ (if generated during build and not part of final app)
+
+# Documentation
+docs/
+
+# Unused frontend files (verify if truly unused)
+# frontend/index_production.html
+frontend/css/tailwind-input.css
+# frontend/css/tailwind-minimal.css
+# frontend/js/app-minimal.js
+# frontend/js/app-test.js
+
+# Local logs
+logs/
+src/logs/
+
+# Notebooks
+notebooks/
+
+# Tests
+tests/
+
+# Git specific
+.git/
+.gitignore
+
+# Tailwind/PostCSS config (build time)
+tailwind.config.js
+postcss.config.js

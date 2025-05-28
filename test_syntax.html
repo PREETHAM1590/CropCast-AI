@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntax Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #101a23;
+            color: white;
+            padding: 20px;
+        }
+        .error {
+            background: #ef4444;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #22c55e;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 JavaScript Syntax Test</h1>
+    <div id="status">Testing...</div>
+    
+    <script>
+        // Test if scripts load without errors
+        window.addEventListener('error', function(e) {
+            document.getElementById('status').innerHTML = `
+                <div class="error">
+                    <h3>❌ JavaScript Error Found:</h3>
+                    <p><strong>File:</strong> ${e.filename}</p>
+                    <p><strong>Line:</strong> ${e.lineno}</p>
+                    <p><strong>Column:</strong> ${e.colno}</p>
+                    <p><strong>Error:</strong> ${e.message}</p>
+                </div>
+            `;
+        });
+        
+        // Load scripts one by one to identify which one has the error
+        const scripts = [
+            'js/config.js',
+            'js/api.js', 
+            'js/utils.js',
+            'js/components.js',
+            'js/pages.js',
+            'js/app.js'
+        ];
+        
+        let loadedScripts = 0;
+        
+        function loadNextScript() {
+            if (loadedScripts >= scripts.length) {
+                document.getElementById('status').innerHTML = `
+                    <div class="success">
+                        <h3>✅ All Scripts Loaded Successfully!</h3>
+                        <p>No syntax errors found in any JavaScript files.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = scripts[loadedScripts];
+            script.onload = function() {
+                console.log(`✅ Loaded: ${scripts[loadedScripts]}`);
+                loadedScripts++;
+                setTimeout(loadNextScript, 100);
+            };
+            script.onerror = function() {
+                document.getElementById('status').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Script Load Error:</h3>
+                        <p><strong>Failed to load:</strong> ${scripts[loadedScripts]}</p>
+                        <p>Check the browser console for more details.</p>
+                    </div>
+                `;
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Start loading scripts
+        setTimeout(loadNextScript, 500);
+    </script>
+</body>
+</html>

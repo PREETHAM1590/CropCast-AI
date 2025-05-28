@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Syntax Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #101a23;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        .success {
+            background: #22c55e;
+            border: 2px solid #16a34a;
+        }
+        .error {
+            background: #ef4444;
+            border: 2px solid #dc2626;
+        }
+        .loading {
+            background: #3b82f6;
+            border: 2px solid #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Final JavaScript Syntax Test</h1>
+    <div id="status" class="status loading">Testing JavaScript syntax...</div>
+    
+    <script>
+        let hasError = false;
+        
+        // Catch any JavaScript errors
+        window.addEventListener('error', function(e) {
+            hasError = true;
+            document.getElementById('status').className = 'status error';
+            document.getElementById('status').innerHTML = `
+                ❌ JavaScript Error Found:<br>
+                <strong>File:</strong> ${e.filename}<br>
+                <strong>Line:</strong> ${e.lineno}<br>
+                <strong>Error:</strong> ${e.message}
+            `;
+        });
+        
+        // Test loading the main app.js file
+        const script = document.createElement('script');
+        script.src = 'js/app.js';
+        script.onload = function() {
+            if (!hasError) {
+                document.getElementById('status').className = 'status success';
+                document.getElementById('status').innerHTML = `
+                    ✅ SUCCESS! All JavaScript syntax is correct!<br>
+                    🎉 app.js loaded without any errors<br>
+                    🚀 CropCast AI is ready to run!
+                `;
+            }
+        };
+        script.onerror = function() {
+            document.getElementById('status').className = 'status error';
+            document.getElementById('status').innerHTML = `
+                ❌ Failed to load app.js<br>
+                Check the browser console for details
+            `;
+        };
+        
+        // Load the script after a short delay
+        setTimeout(() => {
+            document.head.appendChild(script);
+        }, 1000);
+    </script>
+</body>
+</html>

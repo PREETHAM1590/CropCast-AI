@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropCast AI - Agricultural Intelligence Platform</title>
+
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN for new design -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
+
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Leaflet CSS for interactive maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        body {
+            font-family: "Space Grotesk", "Noto Sans", sans-serif;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid #223649;
+            border-top: 4px solid #3d98f4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Smooth transitions */
+        .page-transition {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Hide inactive pages */
+        .page-hidden {
+            display: none;
+        }
+
+        /* Active navigation item */
+        .nav-active {
+            color: #3d98f4 !important;
+            border-bottom: 2px solid #3d98f4;
+            padding-bottom: 4px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #223649;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3d98f4;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2c7de0;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-slate-900 dark:text-white transition-colors duration-300" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-[#101a23] flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <h2 class="text-xl font-semibold text-white">Loading CropCast AI...</h2>
+            <p class="text-gray-400 mt-2">Initializing agricultural intelligence</p>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app" class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden" style="display: none;">
+
+        <!-- Professional Header -->
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-slate-200 dark:border-b-gray-700 px-6 sm:px-10 py-4 bg-white dark:bg-gray-900 transition-colors duration-300">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="size-6 text-[#2563eb]">
+                    <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold leading-tight tracking-[-0.015em] text-slate-900 dark:text-white">CropCast AI</h2>
+            </div>
+            <div class="flex items-center gap-6">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="group size-9 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-slate-100 dark:hover:bg-gray-700 hover:text-slate-600 dark:hover:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-slate-200 dark:border-gray-600 bg-transparent text-slate-700 dark:text-gray-300" aria-label="Toggle theme">
+                    <!-- Moon Icon (Dark Mode) -->
+                    <svg class="moon-icon size-4 shrink-0 scale-0 opacity-0 transition-all group-data-[state=on]:scale-100 group-data-[state=on]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    <!-- Sun Icon (Light Mode) -->
+                    <svg class="sun-icon absolute size-4 shrink-0 scale-100 opacity-100 transition-all group-data-[state=on]:scale-0 group-data-[state=on]:opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </button>
+
+                <div id="main-nav" class="hidden md:flex items-center gap-6">
+                    <a class="nav-link text-sm font-medium leading-normal text-slate-700 dark:text-gray-300 hover:text-[#2563eb] dark:hover:text-blue-400 transition-colors" href="#" data-page="landing">Home</a>
+                    <a class="nav-link text-sm font-medium leading-normal text-slate-700 dark:text-gray-300 hover:text-[#2563eb] dark:hover:text-blue-400 transition-colors" href="#" data-page="rainfall">Rainfall Prediction</a>
+                    <a class="nav-link text-sm font-medium leading-normal text-slate-700 dark:text-gray-300 hover:text-[#2563eb] dark:hover:text-blue-400 transition-colors" href="#" data-page="flood">Flood Risk</a>
+                    <a class="nav-link text-sm font-medium leading-normal text-slate-700 dark:text-gray-300 hover:text-[#2563eb] dark:hover:text-blue-400 transition-colors" href="#" data-page="crops">Crop Recommendation</a>
+                    <a class="nav-link text-sm font-medium leading-normal text-slate-700 dark:text-gray-300 hover:text-[#2563eb] dark:hover:text-blue-400 transition-colors" href="#" data-page="dashboard">Dashboard</a>
+                    <button class="nav-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors" data-page="dashboard">
+                        <span class="truncate">Get Started</span>
+                    </button>
+                </div>
+            </div>
+            <button class="md:hidden text-slate-900 dark:text-white" id="mobile-menu-btn">
+                <span class="material-icons">menu</span>
+            </button>
+        </header>
+
+        <!-- Professional Mobile Menu -->
+        <div id="mobile-menu" class="lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 translate-y-[-100%] opacity-0 shadow-lg">
+            <div class="px-6 py-6 space-y-2">
+                <a href="#" class="nav-link group flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-gray-50 text-gray-700 hover:text-blue-600" data-page="landing">
+                    <span class="material-icons text-lg group-hover:scale-110 transition-transform">home</span>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-link group flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-gray-50 text-gray-700 hover:text-blue-600" data-page="rainfall">
+                    <span class="material-icons text-lg group-hover:scale-110 transition-transform">cloud</span>
+                    <span>Rainfall Prediction</span>
+                </a>
+                <a href="#" class="nav-link group flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-gray-50 text-gray-700 hover:text-blue-600" data-page="flood">
+                    <span class="material-icons text-lg group-hover:scale-110 transition-transform">water</span>
+                    <span>Flood Risk</span>
+                </a>
+                <a href="#" class="nav-link group flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-gray-50 text-gray-700 hover:text-blue-600" data-page="crops">
+                    <span class="material-icons text-lg group-hover:scale-110 transition-transform">agriculture</span>
+                    <span>Crop Recommendations</span>
+                </a>
+                <a href="#" class="nav-link group flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-gray-50 text-gray-700 hover:text-blue-600" data-page="dashboard">
+                    <span class="material-icons text-lg group-hover:scale-110 transition-transform">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-link group flex items-center gap-4 px-4 py-4 rounded-xl text-base font-medium transition-all duration-200 bg-blue-600 text-white hover:bg-blue-700" data-page="dashboard">Get Started</a>
+                <!-- Mobile Theme Toggle Section -->
+                <div class="border-t border-gray-200 pt-6 mt-6">
+                    <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <span class="material-icons text-gray-600">palette</span>
+                            <span class="text-sm font-medium text-gray-700">Theme</span>
+                        </div>
+                        <button id="mobile-theme-toggle" class="w-14 h-7 bg-gray-200 rounded-full p-1 transition-all duration-300 shadow-inner">
+                            <div class="mobile-theme-slider w-5 h-5 bg-white rounded-full transform transition-all duration-300 flex items-center justify-center border border-gray-200">
+                                <span class="material-icons text-xs text-gray-600 mobile-theme-icon">light_mode</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content Container -->
+        <main id="page-container" class="flex-1 pt-0">
+            <!-- Pages will be loaded here dynamically -->
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center py-6 border-t border-solid border-t-slate-200 dark:border-t-gray-700 bg-white dark:bg-gray-900 transition-colors duration-300">
+            <p class="text-sm text-slate-500 dark:text-gray-400">© 2024 CropCast AI. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="fixed top-4 right-4 bg-[#3d98f4] text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-center gap-2">
+            <span class="material-icons">info</span>
+            <span id="toast-message">Notification message</span>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-[#182634] rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="material-icons text-red-500">error</span>
+                <h3 class="text-lg font-semibold text-white">Error</h3>
+            </div>
+            <p id="error-message" class="text-gray-300 mb-4">An error occurred</p>
+            <button id="error-close" class="w-full bg-[#3d98f4] text-white py-2 px-4 rounded-lg hover:bg-opacity-80 transition-colors">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Leaflet JS for interactive maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/pages.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

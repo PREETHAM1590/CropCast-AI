@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropCast AI - Agricultural Intelligence Platform</title>
+    
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS with embedded Tailwind-like styles -->
+    <link rel="stylesheet" href="css/production.css">
+    
+    <style>
+        body {
+            font-family: "Space Grotesk", "Noto Sans", sans-serif;
+            background-color: #101a23;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid #223649;
+            border-top: 4px solid #3d98f4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Smooth transitions */
+        .page-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Hide inactive pages */
+        .page-hidden {
+            display: none;
+        }
+        
+        /* Active navigation item */
+        .nav-active {
+            color: #3d98f4 !important;
+            border-bottom: 2px solid #3d98f4;
+            padding-bottom: 4px;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #223649;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3d98f4;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2c7de0;
+        }
+        
+        /* Utility classes */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-1 { flex: 1; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .min-h-screen { min-height: 100vh; }
+        .text-center { text-align: center; }
+        .text-white { color: white; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .font-bold { font-weight: 700; }
+        .font-medium { font-weight: 500; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .border { border-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .bg-primary { background-color: #3d98f4; }
+        .bg-surface { background-color: #182634; }
+        .bg-background { background-color: #101a23; }
+        .border-border { border-color: #223649; }
+        .hover\:bg-opacity-80:hover { background-color: rgba(61, 152, 244, 0.8); }
+        .transition-colors { transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out; }
+        .cursor-pointer { cursor: pointer; }
+        .hidden { display: none; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .z-50 { z-index: 50; }
+        .transform { transform: translateX(0); }
+        .translate-x-full { transform: translateX(100%); }
+        .duration-300 { transition-duration: 300ms; }
+        .ease-in-out { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Responsive */
+        @media (min-width: 768px) {
+            .md\:flex { display: flex; }
+            .md\:hidden { display: none; }
+        }
+        
+        @media (max-width: 767px) {
+            .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-background flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <h2 class="text-xl font-medium text-white">Loading CropCast AI...</h2>
+            <p class="text-gray-400 mt-2">Initializing agricultural intelligence</p>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app" class="flex min-h-screen flex-col" style="display: none;">
+        
+        <!-- Header -->
+        <header class="flex items-center justify-between border-b border-border px-6 py-4">
+            <div class="flex items-center gap-4">
+                <div class="w-6 h-6 text-primary">
+                    <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold">CropCast AI</h2>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="hidden md:flex items-center gap-6" id="main-nav">
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="home">Home</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="dashboard">Dashboard</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="rainfall">Rainfall</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="flood">Flood Risk</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="soil">Soil Analysis</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="crops">Crop Recommendations</a>
+            </nav>
+            
+            <!-- User Actions -->
+            <div class="flex items-center gap-4">
+                <button id="notifications-btn" class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-opacity-80 transition-colors">
+                    <span class="material-icons mr-2">notifications</span>
+                    <span class="hidden sm:inline">Alerts</span>
+                </button>
+                <button class="md:hidden text-white" id="mobile-menu-btn">
+                    <span class="material-icons">menu</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden bg-surface border-b border-border px-6 py-4 hidden">
+            <nav class="flex flex-col gap-4">
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="home">Home</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="dashboard">Dashboard</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="rainfall">Rainfall Prediction</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="flood">Flood Risk</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="soil">Soil Analysis</a>
+                <a href="#" class="nav-link text-sm font-medium hover:text-primary transition-colors" data-page="crops">Crop Recommendations</a>
+            </nav>
+        </div>
+
+        <!-- Page Content Container -->
+        <main id="page-container" class="flex-1">
+            <!-- Pages will be loaded here dynamically -->
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center py-6 border-t border-border">
+            <p class="text-sm text-gray-400">© 2024 CropCast AI. All rights reserved. Supporting Farmers in Karnataka.</p>
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="fixed top-4 right-4 bg-primary text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-center gap-2">
+            <span class="material-icons">info</span>
+            <span id="toast-message">Notification message</span>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-surface rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="material-icons text-red-500">error</span>
+                <h3 class="text-lg font-medium text-white">Error</h3>
+            </div>
+            <p id="error-message" class="text-gray-300 mb-4">An error occurred</p>
+            <button id="error-close" class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-opacity-80 transition-colors">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/pages.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
